@@ -16,6 +16,7 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
+    plan: free
 
     # Port d'écoute de Tomcat (également injecté dans la variable PORT).
     port: 8080
