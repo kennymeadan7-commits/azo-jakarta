@@ -717,8 +717,8 @@ svg {
 .hero {
   position: relative;
   overflow: hidden;
-  background-image: radial-gradient(900px 420px at 8% -8%, rgba(38, 132, 102, 0.9), transparent 60%),
-    radial-gradient(700px 380px at 96% 4%, rgba(240, 182, 75, 0.55), transparent 62%),
+  background-image: radial-gradient(900px 420px at 8% -8%, rgba(38, 132, 102, 0.22), transparent 60%),
+    radial-gradient(700px 380px at 96% 4%, rgba(240, 182, 75, 0.28), transparent 62%),
     linear-gradient(to bottom, #fbf8f1, #f4eee1);
 }
 
@@ -748,12 +748,21 @@ svg {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-panel);
-  background-image: radial-gradient(circle at 72% 18%, rgba(240, 182, 75, 0.24), transparent 46%),
+  background: radial-gradient(circle at 72% 18%, rgba(240, 182, 75, 0.24), transparent 46%),
     radial-gradient(circle at 20% 86%, rgba(76, 159, 130, 0.45), transparent 55%),
-    linear-gradient(150deg, #0b382d 0%, #07251d 58%, #051c16 100%);
+    linear-gradient(150deg, #0b382d 0%, #07251d 58%, #051c16 100%) !important;
   color: #fff;
   padding: clamp(1.5rem, 4vw, 2.25rem);
   box-shadow: 0 40px 90px -40px rgba(7, 37, 29, 0.55);
+}
+
+.hero-showcase h2,
+.hero-showcase h3 {
+  color: #fff;
+}
+
+.hero-showcase p {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .pattern-grid {
