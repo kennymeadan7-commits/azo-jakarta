@@ -17,10 +17,6 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
-
-    # Port d'écoute de Tomcat (également injecté dans la variable PORT).
-    port: 8080
-
     # Sonde de santé Render : la page d'accueil publique, qui exécute une
     # requête JDBC (donc vérifie aussi la base).
     healthCheckPath: /azo/
