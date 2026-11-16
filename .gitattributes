@@ -1,0 +1,25 @@
+# Normalisation : le dépôt stocke des fins de ligne LF.
+* text=auto
+
+# Le point d'entrée du conteneur DOIT rester en LF (shebang #!/bin/sh),
+# sinon l'image Docker échoue avec « exec format error ».
+*.sh   text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+
+# Modèles de rapports et sources
+*.jrxml text eol=lf
+*.sql   text eol=lf
+*.java  text
+*.jsp   text
+*.xml   text
+*.md    text
+*.css   text
+
+# Binaires
+*.war   binary
+*.jar   binary
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.ttf   binary

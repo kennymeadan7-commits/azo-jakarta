@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration du contexte web /azo.
+
+  1. <Resource>  : pool JDBC (DataSource) publié sous java:comp/env/jdbc/azo.
+
+     Les identifiants PostgreSQL sont PARAMÉTRÉS : ${AZO_DB_URL}, ${AZO_DB_USER}
+     et ${AZO_DB_PASSWORD} sont remplacés au démarrage par Tomcat à partir des
+     variables d'environnement de même nom (le nom entre accolades est celui de
+     la variable). La substitution n'est active que si la JVM est lancée avec
+        -Dorg.apache.tomcat.util.digester.PROPERTY_SOURCE=org.apache.tomcat.util.digester.EnvironmentPropertySource
+     Ce -D est ajouté par docker/entrypoint.sh en production, et à exporter en
+     local avant catalina.bat (voir « Démarrer » dans le README).
+     Valeurs locales : AZO_DB_URL=jdbc:postgresql://localhost:5432/azo_java,
+     AZO_DB_USER=azo, AZO_DB_PASSWORD=azo (détails : DEPLOIEMENT.md).
+
+  2. <Realm>     : JAASRealm — l'authentification est déléguée à JAAS.
+     Tomcat 10.1 ne lit PAS userField/roleField : il compare le nom de classe
+     des principals du Subject aux listes userClassNames / roleClassNames.
+     appName doit correspondre au nom utilisé par AzoJaasConfiguration.
+-->
+<Context docBase="azo" path="/azo" reloadable="false">
+  <!-- reloadable="false" : en production Tomcat ne surveille pas WEB-INF/classes
+       (aucun rechargement automatique surprise). Pour du développement avec un
+       dossier décompressé, repassez à "true". -->
+
+    <Resource name="jdbc/azo"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              driverClassName="org.postgresql.Driver"
+              url="${AZO_DB_URL}"
+              username="${AZO_DB_USER}"
+              password="${AZO_DB_PASSWORD}"
+              maxTotal="20"
+              maxIdle="8"
+              minIdle="2"
+              initialSize="4"
+              maxWaitMillis="10000"
+              validationQuery="SELECT 1"
+              testOnBorrow="true"
+              testWhileIdle="true"
+              timeBetweenEvictionRunsMillis="30000"
+              removeAbandonedOnBorrow="true"
+              removeAbandonedTimeout="60"
+              logAbandoned="true"/>
+
+    <Realm className="org.apache.catalina.realm.JAASRealm"
+           appName="Azo"
+           userClassNames="bj.azo.security.AzoPrincipal"
+           roleClassNames="bj.azo.security.AzoRole"/>
+
+</Context>

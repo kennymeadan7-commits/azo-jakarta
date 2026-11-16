@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Déclaration de la sécurité de l'application : authentification FORM, vérifiée
+  par le Realm JAAS configuré dans META-INF/context.xml.
+
+  Le formulaire de /login.jsp doit poster sur j_security_check avec les champs
+  j_username et j_password (noms imposés par la spécification Servlet).
+-->
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <display-name>Azɔ — Jakarta EE (JSP + JDBC + JAAS)</display-name>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- Ordre important : JAAS avant l'initialisation de la base. -->
+    <listener>
+        <listener-class>bj.azo.config.JaasInitializer</listener-class>
+    </listener>
+    <listener>
+        <listener-class>bj.azo.config.DatabaseInitializer</listener-class>
+    </listener>
+
+    <!-- Recopie l'identité JAAS dans la session pour les JSP. -->
+    <filter>
+        <filter-name>UserSetupFilter</filter-name>
+        <filter-class>bj.azo.web.UserSetupFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>UserSetupFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <!--
+      L'accès direct à /login.jsp est redirigé vers une page protégée : c'est la
+      ressource protégée qui déclenche la séquence FORM de Tomcat (sauvegarde de la
+      requête + changement d'identifiant de session). Sans elle, la validation du
+      formulaire échouerait en 408. Dispatcher REQUEST uniquement : le forward que
+      Tomcat renvoie ensuite vers /login.jsp ne ré-exécute pas ce filtre.
+    -->
+    <filter>
+        <filter-name>LoginPageFilter</filter-name>
+        <filter-class>bj.azo.web.LoginPageFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>LoginPageFilter</filter-name>
+        <url-pattern>/login.jsp</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>LoginPageFilter</filter-name>
+        <url-pattern>/login-error.jsp</url-pattern>
+    </filter-mapping>
+
+    <!-- Pages protégées : Tomcat exige une session JAAS valide. -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Espace connecté</web-resource-name>
+            <url-pattern>/dashboard</url-pattern>
+            <url-pattern>/dashboard/*</url-pattern>
+            <url-pattern>/mes-missions</url-pattern>
+            <url-pattern>/mes-missions/*</url-pattern>
+            <!-- Rapports PDF JasperReports : réservés aux comptes connectés. -->
+            <url-pattern>/rapports</url-pattern>
+            <url-pattern>/rapports/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>CLIENT</role-name>
+            <role-name>WORKER</role-name>
+            <role-name>ADMIN</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>NONE</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <!-- Authentification déclarative : Tomcat gère le cycle j_security_check. -->
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>Azɔ</realm-name>
+        <form-login-config>
+            <form-login-page>/login.jsp</form-login-page>
+            <form-error-page>/login-error.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <security-role>
+        <role-name>ADMIN</role-name>
+    </security-role>
+    <security-role>
+        <role-name>CLIENT</role-name>
+    </security-role>
+    <security-role>
+        <role-name>WORKER</role-name>
+    </security-role>
+
+    <session-config>
+        <session-timeout>60</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+        </cookie-config>
+    </session-config>
+
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error.jsp</location>
+    </error-page>
+</web-app>

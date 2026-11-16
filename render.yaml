@@ -1,0 +1,54 @@
+# =============================================================================
+# Azɔ — blueprint Render.com
+#
+#   Un service web (conteneur Docker : Maven + Tomcat 10.1) et une base
+#   PostgreSQL managée. Le service reçoit DATABASE_URL ; le point d'entrée du
+#   conteneur (docker/entrypoint.sh) en déduit les paramètres JDBC et fait
+#   écouter Tomcat sur le port rendu par Render.
+#
+#   Déploiement : Dashboard Render → "New" → "Blueprint" → dépôt Git.
+#   Guide complet : DEPLOIEMENT.md
+# =============================================================================
+
+services:
+  - type: web
+    name: azo-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+
+    # Port d'écoute de Tomcat (également injecté dans la variable PORT).
+    port: 8080
+
+    # Sonde de santé Render : la page d'accueil publique, qui exécute une
+    # requête JDBC (donc vérifie aussi la base).
+    healthCheckPath: /azo/
+
+    envVars:
+      # Chaine de connexion PostgreSQL publiée par le bloc "databases" ci-dessous.
+      # docker/entrypoint.sh la transforme en jdbc:postgresql://…
+      - key: DATABASE_URL
+        fromDatabase:
+          name: azo-db
+          property: connectionString
+
+      # Alternative : pilotage explicite (à la place de DATABASE_URL).
+      # Décommentez et renseignez pour ignorer la dérivation automatique.
+      # - key: AZO_DB_URL
+      #   value: jdbc:postgresql://hote:5432/base?sslmode=require
+      # - key: AZO_DB_USER
+      #   sync: false
+      # - key: AZO_DB_PASSWORD
+      #   sync: false
+
+    # plan: free        # décommentez si votre compte propose le plan gratuit
+    # (instances gratuites : mise en veille après inactivité, mémoire réduite)
+
+databases:
+  - name: azo-db
+    databaseName: azo
+    user: azo
+    # plan: free       # PostgreSQL gratuit limité dans le temps ; sinon Starter
+
+    # Le schéma et les comptes initiaux sont créés automatiquement par
+    # DatabaseInitializer au premier démarrage du webapp (schema.sql + seed).

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Rapport PDF des missions Azɔ — JasperReports 7 (format JRXML natif v7).
+
+  A4 paysage. La requête est PARAMÉTRÉE : $P{role} et $P{userId} limitent les
+  lignes au périmètre du connecté (identique à MissionDao côté servlet).
+  Dates et montants sont projetés en TEXT, déjà au format français.
+-->
+<jasperReport name="Rapport des missions" language="java"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="794" leftMargin="24" rightMargin="24" topMargin="24" bottomMargin="24">
+
+    <style name="titre" fontName="DejaVu Sans" fontSize="16" bold="true"
+           forecolor="#0E211A" vTextAlign="Middle"/>
+    <style name="sousTitre" fontName="DejaVu Sans" fontSize="9"
+           forecolor="#5F6D64" vTextAlign="Middle"/>
+    <style name="marque" fontName="DejaVu Sans" fontSize="15" bold="true"
+           forecolor="#146B53" hTextAlign="Right" vTextAlign="Middle"/>
+    <style name="marquePied" fontName="DejaVu Sans" fontSize="7.5"
+           forecolor="#5F6D64" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <style name="entete" fontName="DejaVu Sans" fontSize="8" bold="true"
+           forecolor="#FFFFFF" vTextAlign="Middle"/>
+    <style name="enteteCentre" fontName="DejaVu Sans" fontSize="8" bold="true"
+           forecolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle"/>
+    <style name="enteteDroite" fontName="DejaVu Sans" fontSize="8" bold="true"
+           forecolor="#FFFFFF" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <style name="cellule" fontName="DejaVu Sans" fontSize="8.5"
+           forecolor="#0E211A" vTextAlign="Middle"/>
+    <style name="celluleGras" fontName="DejaVu Sans" fontSize="8.5" bold="true"
+           forecolor="#0E211A" vTextAlign="Middle"/>
+    <style name="celluleCentre" fontName="DejaVu Sans" fontSize="8.5"
+           forecolor="#0E211A" hTextAlign="Center" vTextAlign="Middle"/>
+    <style name="celluleDroite" fontName="DejaVu Sans" fontSize="8.5" bold="true"
+           forecolor="#0E211A" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <style name="pied" fontName="DejaVu Sans" fontSize="7.5"
+           forecolor="#5F6D64" vTextAlign="Middle"/>
+    <style name="piedDroite" fontName="DejaVu Sans" fontSize="7.5"
+           forecolor="#5F6D64" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <parameter name="userId" class="java.lang.String" forPrompting="false"/>
+    <parameter name="role" class="java.lang.String" forPrompting="false"/>
+    <parameter name="utilisateur" class="java.lang.String" forPrompting="false"/>
+    <parameter name="dateEdition" class="java.lang.String" forPrompting="false"/>
+
+    <field name="titre" class="java.lang.String"/>
+    <field name="metier" class="java.lang.String"/>
+    <field name="ville" class="java.lang.String"/>
+    <field name="client" class="java.lang.String"/>
+    <field name="ouvrier" class="java.lang.String"/>
+    <field name="statut" class="java.lang.String"/>
+    <field name="montant" class="java.lang.String"/>
+    <field name="dateCreation" class="java.lang.String"/>
+    <field name="datePrevue" class="java.lang.String"/>
+
+    <query language="SQL"><![CDATA[
+        SELECT m."title"    AS "titre",
+               m."trade"    AS "metier",
+               m."city"     AS "ville",
+               c."name"     AS "client",
+               w."name"     AS "ouvrier",
+               CASE m."status"
+                   WHEN 'PENDING'     THEN 'En attente'
+                   WHEN 'QUOTED'      THEN 'Devis envoyé'
+                   WHEN 'ACCEPTED'    THEN 'Acceptée'
+                   WHEN 'IN_PROGRESS' THEN 'En cours'
+                   WHEN 'COMPLETED'   THEN 'Terminée'
+                   WHEN 'CANCELLED'   THEN 'Annulée'
+                   ELSE m."status"
+               END          AS "statut",
+               REPLACE(TO_CHAR(COALESCE(m."quoteAmount", m."budget"), 'FM999G999G999'), ',', ' ')
+                            AS "montant",
+               TO_CHAR(m."createdAt", 'DD/MM/YYYY')    AS "dateCreation",
+               TO_CHAR(m."scheduledFor", 'DD/MM/YYYY') AS "datePrevue"
+        FROM "Mission" m
+        INNER JOIN "User" c ON c."id" = m."clientId"
+        INNER JOIN "User" w ON w."id" = m."workerId"
+        WHERE $P{role} = 'ADMIN'
+           OR ($P{role} = 'CLIENT' AND m."clientId" = $P{userId})
+           OR ($P{role} = 'WORKER' AND m."workerId" = $P{userId})
+        ORDER BY m."createdAt" DESC
+    ]]></query>
+
+    <title height="60">
+        <element kind="rectangle" x="0" y="0" width="794" height="60" mode="Opaque" backcolor="#F7F3EA"/>
+        <element kind="textField" x="16" y="6" width="520" height="26" style="titre">
+            <expression><![CDATA["Rapport des missions"]]></expression>
+        </element>
+        <element kind="textField" x="16" y="32" width="560" height="20" style="sousTitre">
+            <expression><![CDATA["Édité par " + $P{utilisateur} + " — " + $P{dateEdition}]]></expression>
+        </element>
+        <element kind="textField" x="604" y="6" width="174" height="26" style="marque">
+            <expression><![CDATA["Azɔ"]]></expression>
+        </element>
+        <element kind="textField" x="604" y="32" width="174" height="20" style="marquePied">
+            <expression><![CDATA["Les artisans du Bénin"]]></expression>
+        </element>
+        <element kind="rectangle" x="0" y="57" width="794" height="3" mode="Opaque" backcolor="#E8A33D"/>
+    </title>
+
+    <columnHeader height="24">
+        <element kind="rectangle" x="0" y="0" width="794" height="24" mode="Opaque" backcolor="#0E211A"/>
+        <element kind="textField" x="0" y="0" width="220" height="24" style="entete">
+            <expression><![CDATA["Mission"]]></expression>
+        </element>
+        <element kind="textField" x="220" y="0" width="74" height="24" style="entete">
+            <expression><![CDATA["Métier"]]></expression>
+        </element>
+        <element kind="textField" x="294" y="0" width="70" height="24" style="entete">
+            <expression><![CDATA["Ville"]]></expression>
+        </element>
+        <element kind="textField" x="364" y="0" width="83" height="24" style="entete">
+            <expression><![CDATA["Client"]]></expression>
+        </element>
+        <element kind="textField" x="447" y="0" width="83" height="24" style="entete">
+            <expression><![CDATA["Artisan"]]></expression>
+        </element>
+        <element kind="textField" x="530" y="0" width="72" height="24" style="entete">
+            <expression><![CDATA["Statut"]]></expression>
+        </element>
+        <element kind="textField" x="602" y="0" width="75" height="24" style="enteteDroite">
+            <expression><![CDATA["Montant (F CFA)"]]></expression>
+        </element>
+        <element kind="textField" x="677" y="0" width="58" height="24" style="enteteCentre">
+            <expression><![CDATA["Créée le"]]></expression>
+        </element>
+        <element kind="textField" x="735" y="0" width="59" height="24" style="enteteCentre">
+            <expression><![CDATA["Prévue le"]]></expression>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="22">
+            <element kind="rectangle" x="0" y="21" width="794" height="1" mode="Opaque" backcolor="#E2D7C2"/>
+            <element kind="textField" x="0" y="0" width="220" height="22" style="celluleGras">
+                <expression><![CDATA[$F{titre}]]></expression>
+            </element>
+            <element kind="textField" x="220" y="0" width="74" height="22" style="cellule">
+                <expression><![CDATA[$F{metier}]]></expression>
+            </element>
+            <element kind="textField" x="294" y="0" width="70" height="22" style="cellule">
+                <expression><![CDATA[$F{ville}]]></expression>
+            </element>
+            <element kind="textField" x="364" y="0" width="83" height="22" style="cellule">
+                <expression><![CDATA[$F{client}]]></expression>
+            </element>
+            <element kind="textField" x="447" y="0" width="83" height="22" style="cellule">
+                <expression><![CDATA[$F{ouvrier}]]></expression>
+            </element>
+            <element kind="textField" x="530" y="0" width="72" height="22" style="celluleGras">
+                <expression><![CDATA[$F{statut}]]></expression>
+            </element>
+            <element kind="textField" x="602" y="0" width="75" height="22" style="celluleDroite">
+                <expression><![CDATA[$F{montant} == null ? "—" : $F{montant}]]></expression>
+            </element>
+            <element kind="textField" x="677" y="0" width="58" height="22" style="celluleCentre">
+                <expression><![CDATA[$F{dateCreation} == null ? "—" : $F{dateCreation}]]></expression>
+            </element>
+            <element kind="textField" x="735" y="0" width="59" height="22" style="celluleCentre">
+                <expression><![CDATA[$F{datePrevue} == null ? "—" : $F{datePrevue}]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <pageFooter height="16">
+        <element kind="rectangle" x="0" y="0" width="794" height="1" mode="Opaque" backcolor="#E2D7C2"/>
+        <element kind="textField" x="0" y="1" width="560" height="15" style="pied">
+            <expression><![CDATA["Azɔ — plateforme des artisans du Bénin vérifiés"]]></expression>
+        </element>
+        <element kind="textField" x="560" y="1" width="234" height="15" style="piedDroite">
+            <expression><![CDATA["Page " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+    </pageFooter>
+</jasperReport>

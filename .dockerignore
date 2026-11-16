@@ -1,0 +1,15 @@
+# Artefacts locaux : l'étape de build Maven les régénère.
+target/
+
+# Contrôle de version
+.git/
+.gitignore
+
+# Bureaux / IDE
+.idea/
+*.iml
+.vscode/
+
+# Documentation non nécessaire à l'image
+*.md
+!README.md

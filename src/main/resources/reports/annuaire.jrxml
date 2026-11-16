@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Rapport PDF : annuaire des artisans Azɔ — JasperReports 7 (format JRXML natif v7).
+  A4 paysage, une ligne par ouvrier, triée par note puis par missions réalisées.
+  Tarifs, notes et expériences sont projetés en TEXT au format français.
+-->
+<jasperReport name="Annuaire des artisans" language="java"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="794" leftMargin="24" rightMargin="24" topMargin="24" bottomMargin="24">
+
+    <style name="titre" fontName="DejaVu Sans" fontSize="16" bold="true"
+           forecolor="#0E211A" vTextAlign="Middle"/>
+    <style name="sousTitre" fontName="DejaVu Sans" fontSize="9"
+           forecolor="#5F6D64" vTextAlign="Middle"/>
+    <style name="marque" fontName="DejaVu Sans" fontSize="15" bold="true"
+           forecolor="#146B53" hTextAlign="Right" vTextAlign="Middle"/>
+    <style name="marquePied" fontName="DejaVu Sans" fontSize="7.5"
+           forecolor="#5F6D64" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <style name="entete" fontName="DejaVu Sans" fontSize="8" bold="true"
+           forecolor="#FFFFFF" vTextAlign="Middle"/>
+    <style name="enteteDroite" fontName="DejaVu Sans" fontSize="8" bold="true"
+           forecolor="#FFFFFF" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <style name="cellule" fontName="DejaVu Sans" fontSize="8.5"
+           forecolor="#0E211A" vTextAlign="Middle"/>
+    <style name="celluleGras" fontName="DejaVu Sans" fontSize="8.5" bold="true"
+           forecolor="#0E211A" vTextAlign="Middle"/>
+    <style name="celluleDroite" fontName="DejaVu Sans" fontSize="8.5" bold="true"
+           forecolor="#0E211A" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <style name="pied" fontName="DejaVu Sans" fontSize="7.5"
+           forecolor="#5F6D64" vTextAlign="Middle"/>
+    <style name="piedDroite" fontName="DejaVu Sans" fontSize="7.5"
+           forecolor="#5F6D64" hTextAlign="Right" vTextAlign="Middle"/>
+
+    <parameter name="utilisateur" class="java.lang.String" forPrompting="false"/>
+    <parameter name="dateEdition" class="java.lang.String" forPrompting="false"/>
+
+    <field name="nom" class="java.lang.String"/>
+    <field name="metier" class="java.lang.String"/>
+    <field name="ville" class="java.lang.String"/>
+    <field name="telephone" class="java.lang.String"/>
+    <field name="experience" class="java.lang.String"/>
+    <field name="missions" class="java.lang.String"/>
+    <field name="note" class="java.lang.String"/>
+    <field name="tarif" class="java.lang.String"/>
+    <field name="statut" class="java.lang.String"/>
+
+    <query language="SQL"><![CDATA[
+        SELECT u."name" AS "nom",
+               p."trade" AS "metier",
+               p."city"  AS "ville",
+               u."phone" AS "telephone",
+               CASE WHEN p."experience" <= 0 THEN 'Débutant'
+                    ELSE p."experience" || ' ans' END          AS "experience",
+               p."completedJobs"::text                         AS "missions",
+               REPLACE(ROUND(p."ratingAvg"::numeric, 1)::text, '.', ',') AS "note",
+               REPLACE(TO_CHAR(p."dailyRate", 'FM999G999G999'), ',', ' ') AS "tarif",
+               CASE WHEN p."verified" THEN 'Vérifié' ELSE 'À vérifier' END
+                 || ' · '
+                 || CASE WHEN p."available" THEN 'Disponible' ELSE 'Occupé' END AS "statut"
+        FROM "WorkerProfile" p
+        INNER JOIN "User" u ON u."id" = p."userId"
+        ORDER BY p."ratingAvg" DESC, p."completedJobs" DESC
+    ]]></query>
+
+    <title height="60">
+        <element kind="rectangle" x="0" y="0" width="794" height="60" mode="Opaque" backcolor="#F7F3EA"/>
+        <element kind="textField" x="16" y="6" width="520" height="26" style="titre">
+            <expression><![CDATA["Annuaire des artisans"]]></expression>
+        </element>
+        <element kind="textField" x="16" y="32" width="560" height="20" style="sousTitre">
+            <expression><![CDATA["Édité par " + $P{utilisateur} + " — " + $P{dateEdition}]]></expression>
+        </element>
+        <element kind="textField" x="604" y="6" width="174" height="26" style="marque">
+            <expression><![CDATA["Azɔ"]]></expression>
+        </element>
+        <element kind="textField" x="604" y="32" width="174" height="20" style="marquePied">
+            <expression><![CDATA["Les artisans du Bénin"]]></expression>
+        </element>
+        <element kind="rectangle" x="0" y="57" width="794" height="3" mode="Opaque" backcolor="#E8A33D"/>
+    </title>
+
+    <columnHeader height="24">
+        <element kind="rectangle" x="0" y="0" width="794" height="24" mode="Opaque" backcolor="#0E211A"/>
+        <element kind="textField" x="0" y="0" width="145" height="24" style="entete">
+            <expression><![CDATA["Artisan"]]></expression>
+        </element>
+        <element kind="textField" x="145" y="0" width="92" height="24" style="entete">
+            <expression><![CDATA["Métier"]]></expression>
+        </element>
+        <element kind="textField" x="237" y="0" width="78" height="24" style="entete">
+            <expression><![CDATA["Ville"]]></expression>
+        </element>
+        <element kind="textField" x="315" y="0" width="82" height="24" style="entete">
+            <expression><![CDATA["Téléphone"]]></expression>
+        </element>
+        <element kind="textField" x="397" y="0" width="68" height="24" style="entete">
+            <expression><![CDATA["Expérience"]]></expression>
+        </element>
+        <element kind="textField" x="465" y="0" width="58" height="24" style="enteteDroite">
+            <expression><![CDATA["Missions"]]></expression>
+        </element>
+        <element kind="textField" x="523" y="0" width="52" height="24" style="enteteDroite">
+            <expression><![CDATA["Note"]]></expression>
+        </element>
+        <element kind="textField" x="575" y="0" width="92" height="24" style="enteteDroite">
+            <expression><![CDATA["Tarif / jour"]]></expression>
+        </element>
+        <element kind="textField" x="667" y="0" width="127" height="24" style="entete">
+            <expression><![CDATA["Statut"]]></expression>
+        </element>
+    </columnHeader>
+
+    <detail>
+        <band height="22">
+            <element kind="rectangle" x="0" y="21" width="794" height="1" mode="Opaque" backcolor="#E2D7C2"/>
+            <element kind="textField" x="0" y="0" width="145" height="22" style="celluleGras">
+                <expression><![CDATA[$F{nom}]]></expression>
+            </element>
+            <element kind="textField" x="145" y="0" width="92" height="22" style="cellule">
+                <expression><![CDATA[$F{metier}]]></expression>
+            </element>
+            <element kind="textField" x="237" y="0" width="78" height="22" style="cellule">
+                <expression><![CDATA[$F{ville}]]></expression>
+            </element>
+            <element kind="textField" x="315" y="0" width="82" height="22" style="cellule">
+                <expression><![CDATA[$F{telephone}]]></expression>
+            </element>
+            <element kind="textField" x="397" y="0" width="68" height="22" style="cellule">
+                <expression><![CDATA[$F{experience}]]></expression>
+            </element>
+            <element kind="textField" x="465" y="0" width="58" height="22" style="celluleDroite">
+                <expression><![CDATA[$F{missions}]]></expression>
+            </element>
+            <element kind="textField" x="523" y="0" width="52" height="22" style="celluleDroite">
+                <expression><![CDATA[$F{note}]]></expression>
+            </element>
+            <element kind="textField" x="575" y="0" width="92" height="22" style="celluleDroite">
+                <expression><![CDATA[$F{tarif} == null ? "—" : $F{tarif} + " F" ]]></expression>
+            </element>
+            <element kind="textField" x="667" y="0" width="127" height="22" style="cellule">
+                <expression><![CDATA[$F{statut}]]></expression>
+            </element>
+        </band>
+    </detail>
+
+    <pageFooter height="16">
+        <element kind="rectangle" x="0" y="0" width="794" height="1" mode="Opaque" backcolor="#E2D7C2"/>
+        <element kind="textField" x="0" y="1" width="560" height="15" style="pied">
+            <expression><![CDATA["Azɔ — plateforme des artisans du Bénin vérifiés"]]></expression>
+        </element>
+        <element kind="textField" x="560" y="1" width="234" height="15" style="piedDroite">
+            <expression><![CDATA["Page " + $V{PAGE_NUMBER}]]></expression>
+        </element>
+    </pageFooter>
+</jasperReport>
