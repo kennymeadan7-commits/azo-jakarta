@@ -58,6 +58,24 @@
         <url-pattern>/login-error.jsp</url-pattern>
     </filter-mapping>
 
+    <!--
+      Cache public de 24 h sur les ressources statiques : sans cet en-tête, le
+      navigateur revalide le fichier à chaque visite (cache heuristique) et peut
+      afficher un thème périmé après une mise à jour. Le thème est versionné
+      dans l'URL (style.css?v=AAAAJJMM) : un bump de version force le
+      rechargement, voir StaticCacheFilter.
+    -->
+    <filter>
+        <filter-name>StaticCacheFilter</filter-name>
+        <filter-class>bj.azo.web.StaticCacheFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>StaticCacheFilter</filter-name>
+        <url-pattern>/css/*</url-pattern>
+        <url-pattern>/js/*</url-pattern>
+        <url-pattern>/images/*</url-pattern>
+    </filter-mapping>
+
     <!-- Pages protégées : Tomcat exige une session JAAS valide. -->
     <security-constraint>
         <web-resource-collection>

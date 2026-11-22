@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nos métiers — Azɔ</title>
   <meta name="description" content="Plomberie, électricité, maçonnerie, ménage, climatisation : les métiers couverts par Azɔ au Bénin, avec le nombre d'ouvriers et les tarifs indicatifs.">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261122">
 </head>
 <body>
 <jsp:include page="/WEB-INF/jspf/header.jsp"/>

@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tableau de bord — Azɔ</title>
   <meta name="robots" content="noindex">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261122">
 </head>
 <body>
 <jsp:include page="/WEB-INF/jspf/header.jsp"/>

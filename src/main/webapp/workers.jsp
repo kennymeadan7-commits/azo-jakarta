@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nos ouvriers — Azɔ</title>
   <meta name="description" content="Liste des artisans et travailleurs indépendants enregistrés sur Azɔ, classés par note.">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261122">
 </head>
 <body>
 <jsp:include page="/WEB-INF/jspf/header.jsp"/>

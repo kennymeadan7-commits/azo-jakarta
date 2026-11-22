@@ -9,7 +9,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><c:out value="${worker.name}"/> — Azɔ</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261122">
 </head>
 <body>
 <jsp:include page="/WEB-INF/jspf/header.jsp"/>

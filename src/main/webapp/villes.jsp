@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nos villes — Azɔ</title>
   <meta name="description" content="La couverture territoriale d'Azɔ au Bénin : Cotonou, Abomey-Calavi, Parakou, Bohicon et les villes où des artisans vérifiés sont disponibles.">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261122">
 </head>
 <body>
 <jsp:include page="/WEB-INF/jspf/header.jsp"/>
